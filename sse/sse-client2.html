@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Title</title>
+</head>
+<body>
+    <h1>SSE 客户端</h1>
+    <h1>jiangqiming</h1>
+    <div id ="messages"></div>
+    <script>
+        var source = null;
+        var userId=Math.random().toString(36).substr(2,9);//后续id是动态的
+        if (window.EventSource){//判断浏览器是否支持SSE
+            //创建SSE对象
+            source = new EventSource("http://localhost:8080/sse/connect?userId=" + userId);
+            //建立连接成功，就会触发open事件
+            source.addEventListener("open",function(e){
+                console.log("连接成功");
+                var text =document.getElementById("messages");
+                text.innerHTML += "连接成功<br/>";
+            },false);
+            //客户端接收到服务端的消息，就会触发message事件
+            source.addEventListener("message",function(e){
+                console.log("收到服务端消息"+e.data);
+                var text =document.getElementById("messages");
+                text.innerHTML += "收到服务端消息："+e.data+"<br/>";
+            },false);
+            //add推荐 stream流式推荐
+            source.addEventListener("add",function(e){
+                console.log("收到服务端消息"+e.data);
+                var text =document.getElementById("messages");
+                text.innerHTML += e.data+"<br/>";
+            },false);
+            //自定义ding
+            source.addEventListener("coustor",function(e){
+                console.log("收到服务端消息"+e.data);
+                var text =document.getElementById("messages");
+                text.innerHTML += "自定义事件"+e.data+"<br/>";
+            },false);
+            //错误
+            source.addEventListener("error",function(e){
+                console.log("SSE连接错误");
+                closeSSE();
+            },false);
+        }else{
+            alert("你的浏览器不支持SSE");
+            closeSSE();
+        }
+        function closeSSE(){
+            source.close();
+        }
+    </script>
+</body>
+
+</html>
